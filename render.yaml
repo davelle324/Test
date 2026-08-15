@@ -1,0 +1,5 @@
+services:
+  - type: static
+    name: sample-site
+    buildCommand: ""
+    staticPublishPath: .

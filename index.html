@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Deployment Test</title>
+  <title>Auto Deploy — Test Site</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -23,10 +23,7 @@
       max-width: 480px;
       width: 90%;
     }
-    .check {
-      font-size: 64px;
-      margin-bottom: 1rem;
-    }
+    .check { font-size: 64px; margin-bottom: 1rem; }
     h1 {
       font-size: 28px;
       font-weight: 700;
@@ -37,19 +34,28 @@
       color: #6e6e73;
       font-size: 15px;
       line-height: 1.6;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
     }
-    .badge {
-      display: inline-block;
-      background: #d1fae5;
-      color: #065f46;
-      padding: .3rem .9rem;
+    .platforms {
+      display: flex;
+      justify-content: center;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+    .platform {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      padding: .35rem .85rem;
       border-radius: 20px;
       font-size: 13px;
       font-weight: 600;
     }
     .meta {
-      margin-top: 2rem;
       font-size: 12px;
       color: #aeaeb2;
     }
@@ -59,11 +65,13 @@
   <div class="card">
     <div class="check">✅</div>
     <h1>Deployment works!</h1>
-    <p>This page was deployed automatically via Auto Deploy. If you can read this, the pipeline is working correctly.</p>
-    <span class="badge">Status: Live</span>
-    <div class="meta">
-      Deployed at: <span id="ts"></span>
+    <p>This page is deployed via Auto Deploy. If you can read this, the pipeline is working correctly for this platform.</p>
+    <div class="platforms">
+      <span class="platform">▲ Vercel</span>
+      <span class="platform">⬛ Render</span>
+      <span class="platform">◆ Netlify</span>
     </div>
+    <div class="meta">Deployed at: <span id="ts"></span></div>
   </div>
   <script>
     document.getElementById("ts").textContent = new Date().toUTCString();
