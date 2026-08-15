@@ -7,3 +7,9 @@ services:
       - path: /*
         name: Access-Control-Allow-Origin
         value: "*"
+      - path: /*
+        name: Access-Control-Allow-Methods
+        value: "GET, HEAD, OPTIONS"
+      - path: /*
+        name: Access-Control-Allow-Headers
+        value: "*"

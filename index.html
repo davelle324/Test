@@ -130,7 +130,7 @@
       detail.textContent = "Fetching /health.json…";
 
       try {
-        const res = await fetch(base + "/health.json", { cache: "no-store" });
+        const res = await fetch(`${base}/health.json?_=${Date.now()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
