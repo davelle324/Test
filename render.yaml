@@ -3,3 +3,7 @@ services:
     name: sample-site
     buildCommand: ""
     staticPublishPath: .
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"

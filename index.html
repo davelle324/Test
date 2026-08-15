@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto Deploy — Test Site</title>
+  <title>Auto Deploy — Multi-Platform Test</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -13,68 +13,141 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      padding: 2rem;
     }
     .card {
       background: #fff;
       border-radius: 16px;
-      padding: 3rem 2.5rem;
-      text-align: center;
+      padding: 2.5rem;
       box-shadow: 0 4px 24px rgba(0,0,0,.08);
-      max-width: 480px;
-      width: 90%;
+      max-width: 520px;
+      width: 100%;
     }
-    .check { font-size: 64px; margin-bottom: 1rem; }
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1d1d1f;
-      margin-bottom: .5rem;
-    }
-    p {
-      color: #6e6e73;
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 1.75rem;
-    }
-    .platforms {
+    h1 { font-size: 22px; font-weight: 700; color: #1d1d1f; margin-bottom: .4rem; }
+    .subtitle { color: #6e6e73; font-size: 14px; margin-bottom: 2rem; }
+    .platform-row {
       display: flex;
-      justify-content: center;
-      gap: .75rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.75rem;
-    }
-    .platform {
-      display: inline-flex;
       align-items: center;
-      gap: .4rem;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
-      padding: .35rem .85rem;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
+      justify-content: space-between;
+      padding: .9rem 1rem;
+      border: 1px solid #e5e5ea;
+      border-radius: 10px;
+      margin-bottom: .75rem;
     }
-    .meta {
+    .platform-name { font-weight: 600; font-size: 15px; color: #1d1d1f; }
+    .platform-detail { font-size: 12px; color: #aeaeb2; margin-top: 2px; }
+    .badge {
       font-size: 12px;
-      color: #aeaeb2;
+      font-weight: 600;
+      padding: .25rem .7rem;
+      border-radius: 12px;
     }
+    .badge-ok   { background: #d1fae5; color: #065f46; }
+    .badge-err  { background: #fee2e2; color: #991b1b; }
+    .badge-wait { background: #f3f4f6; color: #6b7280; }
+    hr { border: none; border-top: 1px solid #f0f0f5; margin: 1.5rem 0; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #1d1d1f; margin-bottom: .5rem; }
+    .input-row { display: flex; gap: .5rem; }
+    input[type=text] {
+      flex: 1;
+      border: 1px solid #d1d1d6;
+      border-radius: 8px;
+      padding: .5rem .75rem;
+      font-size: 14px;
+      outline: none;
+    }
+    input[type=text]:focus { border-color: #0071e3; }
+    button {
+      background: #0071e3;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: .5rem 1rem;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover { background: #0077ed; }
+    .hint { font-size: 12px; color: #aeaeb2; margin-top: .5rem; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="check">✅</div>
-    <h1>Deployment works!</h1>
-    <p>This page is deployed via Auto Deploy. If you can read this, the pipeline is working correctly for this platform.</p>
-    <div class="platforms">
-      <span class="platform">▲ Vercel</span>
-      <span class="platform">⬛ Render</span>
-      <span class="platform">◆ Netlify</span>
+    <h1>Multi-Platform Test</h1>
+    <p class="subtitle">Verify two platforms are live and talking to each other.</p>
+
+    <!-- Vercel status (always visible since you're reading this) -->
+    <div class="platform-row">
+      <div>
+        <div class="platform-name">▲ Vercel — frontend</div>
+        <div class="platform-detail" id="vercel-detail">Loaded at <span id="ts"></span></div>
+      </div>
+      <span class="badge badge-ok">Live</span>
     </div>
-    <div class="meta">Deployed at: <span id="ts"></span></div>
+
+    <!-- Render status (fetched on demand) -->
+    <div class="platform-row">
+      <div>
+        <div class="platform-name">⬛ Render — backend</div>
+        <div class="platform-detail" id="render-detail">Enter URL below to test</div>
+      </div>
+      <span class="badge badge-wait" id="render-badge">Pending</span>
+    </div>
+
+    <hr>
+
+    <label for="render-url">Render deployment URL</label>
+    <div class="input-row">
+      <input type="text" id="render-url" placeholder="https://sample-site-xxxx.onrender.com">
+      <button onclick="ping()">Test</button>
+    </div>
+    <p class="hint">
+      Paste the URL from your Render card in the Auto Deploy dashboard,
+      then click Test. This page will fetch <code>/health.json</code> from
+      that URL — if it responds, both platforms are confirmed working together.
+    </p>
   </div>
+
   <script>
-    document.getElementById("ts").textContent = new Date().toUTCString();
+    document.getElementById("ts").textContent = new Date().toLocaleTimeString();
+
+    // Auto-run if ?api= is in the URL (e.g. shared as a link)
+    const params = new URLSearchParams(location.search);
+    if (params.get("api")) {
+      document.getElementById("render-url").value = params.get("api");
+      ping();
+    }
+
+    async function ping() {
+      const base = document.getElementById("render-url").value.trim().replace(/\/$/, "");
+      if (!base) return;
+
+      const badge  = document.getElementById("render-badge");
+      const detail = document.getElementById("render-detail");
+      badge.className  = "badge badge-wait";
+      badge.textContent = "Checking…";
+      detail.textContent = "Fetching /health.json…";
+
+      try {
+        const res = await fetch(base + "/health.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        badge.className  = "badge badge-ok";
+        badge.textContent = "Live";
+        detail.textContent = `Responded: ${data.platform ?? "ok"} — ${new Date().toLocaleTimeString()}`;
+
+        // Update the URL bar so this link can be shared
+        const url = new URL(location.href);
+        url.searchParams.set("api", base);
+        history.replaceState(null, "", url);
+      } catch (err) {
+        badge.className  = "badge badge-err";
+        badge.textContent = "Failed";
+        detail.textContent = `Could not reach ${base} — ${err.message}`;
+      }
+    }
   </script>
 </body>
 </html>
