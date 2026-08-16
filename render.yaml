@@ -1,7 +1,7 @@
 services:
   - type: static
     name: sample-site
-    buildCommand: ""
+    buildCommand: "bash build.sh"
     staticPublishPath: .
     headers:
       - path: /*
